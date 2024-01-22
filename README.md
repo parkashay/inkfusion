@@ -1,6 +1,6 @@
 ### To run locally:
 
- - git clone <repo>
+ - git clone repo
 
 Client:
  - cd client

@@ -12,11 +12,13 @@ const Toolbar = () => {
   const activeMenu = useSelector(
     (state: RootState) => state.menu.activeMenuItem
   );
+
   const handleMenuClick = (name: string) => {
     dispatch(menuItemClick(name));
   };
   const handleReset = () => {
-    socket.emit("clear");
+    if (socket.connected) socket.emit("clear");
+    else window.location.reload();
   };
   const iconProps: LucideProps = {
     strokeWidth: 3,

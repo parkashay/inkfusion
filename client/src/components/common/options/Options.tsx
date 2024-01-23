@@ -4,6 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import { MENU_ITEMS } from "@/constants";
 import { brushColorChange, brushSizeChange } from "@/redux/slices/optionsSlice";
 import { RootState } from "@/redux/store";
+import { socket } from "@/socket";
 import { ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -17,6 +18,7 @@ const Options = () => {
   const dispatch = useDispatch();
   const handleColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(brushColorChange(e.target.value));
+    socket.emit("update-user", { color: brushColor, socketId: socket.id });
   };
   const handleBrushSizeChange = (e: number[]) => {
     dispatch(brushSizeChange(e[0]));

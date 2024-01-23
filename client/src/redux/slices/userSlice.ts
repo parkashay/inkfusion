@@ -11,26 +11,17 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUsers: (state, action: PayloadAction<UserState[]>) => {
-      const users = action.payload;
-      users.forEach((user) => {
-        if (!state.find((stateUser) => stateUser.name === user.name)) {
-          state.push(user);
-        }
-      });
-    },
-    updateUser: (state, action: PayloadAction<UserState>) => {
-      const index = state.findIndex(
-        (user) => user.name === action.payload.name
-      );
-      if (index !== -1) {
-        state[index] = action.payload;
+      // const users = action.payload;
+      console.log(action.payload)
+      if(action.payload.length > 0){
+        state = action.payload
+        return state
+        console.log(state)
       }
-    },
-    removeUser: (state, action: PayloadAction<string>) => {
-      return state.filter((user) => user.name !== action.payload);
+     
     },
   },
 });
 
-export const { setUsers, removeUser } = userSlice.actions;
+export const { setUsers } = userSlice.actions;
 export default userSlice.reducer;

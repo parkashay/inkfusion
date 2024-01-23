@@ -5,12 +5,15 @@ import { Button } from "../../ui/button";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/socket";
+
 const HeroSection = () => {
   const router = useRouter();
   const [userName, setUserName] = useState<string>("");
+
   const gotoBoard = () => {
     if (!userName) return;
     socket.emit("newUser", { name: userName, color: "#000000" });
+    localStorage.setItem("username", userName);
     router.push("/board");
   };
   return (

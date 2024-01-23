@@ -11,17 +11,65 @@ const io = new Server(server, {
 });
 
 let userDetails = [];
-app.get('/', (req, res) => {
+
+const users = new Map();
+
+app.get("/", (req, res) => {
   return res.json({
-    "Hello": "World"
-  })
-})
+    Status: "Up and Running...",
+  });
+});
 
 io.on("connection", (socket) => {
-  console.log("connection");
-
   socket.on("frontend-connected", () => {
     socket.broadcast.emit("ready-to-recieve");
+  });
+
+  socket.emit(
+    "users-list",
+    Array.from(users, ([_, user]) => user)
+  );
+
+  socket.on("login-user", (username) => {
+    for (let [socketId, user] of users) {
+      if (user.name === username) {
+        users.delete(socketId);
+        users.set(socket.id, user);
+        break;
+      }
+    }
+
+    socket.emit(
+      "users-list",
+      Array.from(users, ([_, user]) => user)
+    );
+  });
+
+  socket.on("update-user", (payload) => {
+    console.log(payload);
+    if (users.has(payload.socketId)) {
+      users.set(payload.socketId, {
+        ...users.get(payload.socketId),
+        color: payload.color,
+      });
+    }
+
+    socket.emit(
+      "users-list",
+      Array.from(users, ([_, user]) => user)
+    );
+  });
+
+  socket.on("newUser", (user) => {
+    userDetails.push(user);
+    users.set(socket.id, user);
+
+    console.log("on-new-user", users);
+
+    io.emit(
+      "users-list",
+      Array.from(users, ([_, user]) => user)
+    );
   });
 
   socket.on("canvas-state", (state) => {
@@ -41,15 +89,13 @@ io.on("connection", (socket) => {
     io.emit("clear");
   });
 
-  socket.on("newUser", (user) => {
-    userDetails.push(user);
-    io.emit('users', userDetails)
-  });
-
   socket.on("disconnect", () => {
-    userDetails = [];
-    socket.broadcast.emit('users', userDetails)
-  })
+    users.delete(socket.id);
+    socket.broadcast.emit(
+      "users-list",
+      Array.from(users, ([_, user]) => user)
+    );
+  });
 });
 
 server.listen(5000, (err) => {
